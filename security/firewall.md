@@ -134,7 +134,7 @@ In order to allow networking between qubes A and B follow these steps:
 * In the firewall VM's terminal enter the following iptables rule:
 
 ~~~
-sudo iptables -I FORWARD 2 -s <IP address of A> -d <IP address of B> -j ACCEPT
+sudo iptables -I QBS-FORWARD -s <IP address of A> -d <IP address of B> -j ACCEPT
 ~~~
 
 * In qube B's terminal enter the following iptables rule:
@@ -159,7 +159,7 @@ sudo iptables -I INPUT -s <IP address of A> -j ACCEPT
 
 ~~~
 [user@sys-firewall ~]$ sudo bash
-[root@sys-firewall user]# echo "iptables -I FORWARD 2 -s 10.137.2.25 -d 10.137.2.6 -j ACCEPT" >> /rw/config/qubes-firewall-user-script
+[root@sys-firewall user]# echo "iptables -I QBS-FORWARD -s 10.137.2.25 -d 10.137.2.6 -j ACCEPT" >> /rw/config/qubes-firewall-user-script
 [root@sys-firewall user]# chmod +x /rw/config/qubes-firewall-user-script
 ~~~
 
@@ -219,7 +219,7 @@ traffic on the outside interface for the service to the sys-firewall VM
 Code the appropriate new filtering firewall rule to allow new connections for
 the service
 
-` iptables -I FORWARD 2 -i eth0 -d 10.137.1.x -p tcp --dport 443 -m conntrack --ctstate NEW -j ACCEPT `
+` iptables -I QBS-FORWARD -i eth0 -d 10.137.1.x -p tcp --dport 443 -m conntrack --ctstate NEW -j ACCEPT `
 
 > Note: If you want to expose the service on multiple interfaces, repeat the
   steps described in part 1 for each interface
@@ -284,10 +284,10 @@ if iptables -N MY-HTTPS; then
 fi
 
 # If no forward rule exist for my service
-if ! iptables -n -L FORWARD | grep --quiet MY-HTTPS; then
+if ! iptables -n -L QBS-FORWARD | grep --quiet MY-HTTPS; then
 
 # add a forward rule for the traffic (same reason)
-  iptables -I FORWARD 2 -d 10.137.1.x -p tcp --dport 443 -m conntrack --ctstate NEW -j MY-HTTPS
+  iptables -I QBS-FORWARD -d 10.137.1.x -p tcp --dport 443 -m conntrack --ctstate NEW -j MY-HTTPS
 
 fi
 ~~~
@@ -326,7 +326,7 @@ traffic on its outside interface for the service to the qube
 Code the appropriate new filtering firewall rule to allow new connections for
 the service
 
-` iptables -I FORWARD 2 -i eth0 -s 192.168.x.0/24 -d 10.137.2.y -p tcp --dport 443 -m conntrack --ctstate NEW -j ACCEPT `
+` iptables -I QBS-FORWARD -i eth0 -s 192.168.x.0/24 -d 10.137.2.y -p tcp --dport 443 -m conntrack --ctstate NEW -j ACCEPT `
 
 > Note: If you do not wish to limit the IP addresses connecting to the service,
   remove the ` -s 192.168.0.1/24 `
@@ -375,7 +375,7 @@ if iptables -N MY-HTTPS; then
 fi
 
 # If no forward rule exist for my service
-if ! iptables -n -L FORWARD | grep --quiet MY-HTTPS; then
+if ! iptables -n -L QBS-FORWARD | grep --quiet MY-HTTPS; then
 
 # add a forward rule for the traffic (same reason)
   iptables -I FORWARD 4 -d 10.137.2.y -p tcp --dport 443 -m conntrack --ctstate NEW -j MY-HTTPS
